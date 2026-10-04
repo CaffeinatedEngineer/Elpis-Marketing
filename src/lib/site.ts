@@ -1,5 +1,5 @@
-// Hosted app (Cloudflare quick tunnel; update when a stable domain lands).
-export const APP = "https://lisa-threats-exclusive-managed.trycloudflare.com";
+// Hosted app on Cloudflare Pages (permanent free domain).
+export const APP = "https://elpis-app.pages.dev";
 export const CONTACT = "notsekiro11@gmail.com";
 
 // Shared styles for content pages (inline only, no CSS file changes).
