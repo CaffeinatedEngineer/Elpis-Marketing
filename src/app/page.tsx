@@ -1,6 +1,9 @@
 import ScrollReveal from "./reveal";
 import SiteEffects from "./site-effects";
 
+// Hosted app (Cloudflare quick tunnel — update when a stable domain lands).
+const APP = "https://lisa-threats-exclusive-managed.trycloudflare.com";
+
 const whyItems = [
   {
     title: "Correlate evidence across every source in one pass.",
@@ -131,7 +134,7 @@ const stats = [
   { num: "30", label: "tool-call cap per investigation" },
   { num: "6", label: "specialist agents collecting evidence in parallel" },
   { num: "384", label: "dimension pgvector embeddings for incident RAG" },
-  { num: "23", label: "passing tests in the CI suite" },
+  { num: "26", label: "passing tests in the CI suite" },
 ];
 
 const stack = [
@@ -167,9 +170,9 @@ const footerLinks = {
   ],
   Developers: [
     ["Quickstart", "#start"],
-    ["API reference", "https://github.com/CaffeinatedEngineer/SRE.AI"],
+    ["Live app", APP],
     ["Evaluation harness", "#evaluation"],
-    ["Repository", "https://github.com/CaffeinatedEngineer/SRE.AI"],
+    ["Sign up", `${APP}/signup`],
   ],
   Architecture: [
     ["LangGraph workflow", "#how"],
@@ -178,10 +181,10 @@ const footerLinks = {
     ["Observability", "#how"],
   ],
   Project: [
-    ["GitHub", "https://github.com/CaffeinatedEngineer/SRE.AI"],
-    ["README", "https://github.com/CaffeinatedEngineer/SRE.AI/blob/main/README.md"],
-    ["PRD", "https://github.com/CaffeinatedEngineer/SRE.AI/blob/main/Elpis_PRD.md"],
-    ["Production gaps", "https://github.com/CaffeinatedEngineer/SRE.AI/blob/main/PRODUCTION_GAPS.md"],
+    ["Try the demo", `${APP}/login`],
+    ["Sign up free", `${APP}/signup`],
+    ["Apply for startups", "/apply"],
+    ["Bring your own key", "#start"],
   ],
 };
 
@@ -204,18 +207,14 @@ export default function Home() {
             <a href="#how">How it works</a>
             <a href="#evaluation">Evaluation</a>
             <a href="#start">Get started</a>
+            <a href="/apply">For startups</a>
           </nav>
           <div className="header-cta">
-            <a
-              className="btn btn-ghost btn-sm"
-              href="https://github.com/CaffeinatedEngineer/SRE.AI"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
+            <a className="btn btn-ghost btn-sm" href={`${APP}/signup`}>
+              Try it free
             </a>
-            <a className="btn btn-sm" href="#start">
-              Run the demo
+            <a className="btn btn-sm" href="/apply">
+              Apply now
             </a>
           </div>
           <details className="mobile-nav">
@@ -226,9 +225,8 @@ export default function Home() {
               <a href="#how">How it works</a>
               <a href="#evaluation">Evaluation</a>
               <a href="#start">Get started</a>
-              <a href="https://github.com/CaffeinatedEngineer/SRE.AI" target="_blank" rel="noopener noreferrer">
-                GitHub
-              </a>
+              <a href="/apply">For startups</a>
+              <a href={`${APP}/signup`}>Try it free</a>
             </div>
           </details>
         </div>
@@ -247,10 +245,12 @@ export default function Home() {
               <p className="lede" style={{ marginTop: 24 }}>
                 Elpis is an AI SRE that correlates logs, metrics, traces, deployments and Git
                 changes into an evidence-backed root cause, proposes a risk-classified fix, and
-                executes only after a human says yes, with a full audit trail.
+                executes only after a human says yes, with a full audit trail. Open signup — no
+                card, no sales call — and you bring your own LLM key, so there is zero markup on
+                your AI spend.
               </p>
               <div className="hero-actions">
-                <a className="btn btn-accent" href="#start">
+                <a className="btn btn-accent" href={`${APP}/signup`}>
                   Run the 60-second demo
                 </a>
                 <a className="btn btn-ghost" href="#how">
@@ -637,7 +637,7 @@ export default function Home() {
                 <span className="p">$</span> python -m pytest tests -q
               </div>
               <div>
-                <span className="hl">23 passed</span>
+                <span className="hl">26 passed</span>
               </div>
             </div>
           </div>
@@ -655,54 +655,49 @@ export default function Home() {
           <div className="cta-box">
             <div>
               <div className="kicker">
-                <em>Get started</em> · two terminals, one incident
+                <em>Get started</em> · open signup, no install
               </div>
-              <h2 className="h2">See it investigate in under a minute.</h2>
+              <h2 className="h2">Try it free in your browser.</h2>
               <p className="lede" style={{ marginTop: 20 }}>
-                Start the FastAPI backend and the Next.js UI, inject a fault, hit investigate, and
-                watch the agent graph, timeline and evidence fill in live. Then approve the fix
-                and see it verify recovery. Demo roles: viewer / engineer / sre / admin.
+                Sign up with an email and password — you start at SRE. Inject a fault, hit
+                investigate, and watch the agent graph, timeline and evidence fill in live. Then
+                approve the fix and see it verify recovery. Every account gets private incidents,
+                your own OpenAI-compatible key in Settings (or the free built-in model), and demo
+                logins viewer / engineer / sre / admin.
               </p>
               <div className="cta-actions">
-                <a
-                  className="btn btn-accent"
-                  href="https://github.com/CaffeinatedEngineer/SRE.AI"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Clone on GitHub →
+                <a className="btn btn-accent" href={`${APP}/signup`}>
+                  Sign up free →
                 </a>
-                <a className="btn btn-ghost" href="#why">
-                  Back to top
+                <a className="btn btn-ghost" href="/apply">
+                  Want this for your startup? Apply →
                 </a>
               </div>
             </div>
             <div className="code" aria-hidden="true">
               <div>
-                  <span className="c"># terminal 1: API (:8000)</span>
+                <span className="c"># 1. sign up — open registration, role SRE</span>
               </div>
               <div>
-                <span className="p">$</span> uvicorn apps.api.main:app --reload
+                <span className="p">$</span> POST /api/auth/signup
               </div>
               <div style={{ marginTop: 12 }}>
-                  <span className="c"># terminal 2: UI (:3000)</span>
+                <span className="c"># 2. inject a P1 fault</span>
               </div>
               <div>
-                <span className="p">$</span> cd apps/frontend &amp;&amp; npm run dev
+                <span className="p">$</span> POST /api/simulate/high_cpu
               </div>
               <div style={{ marginTop: 12 }}>
-                <span className="c"># inject a P1 fault</span>
+                <span className="c"># 3. investigate — runs in the background</span>
               </div>
               <div>
-                <span className="p">$</span> curl -X POST localhost:8000/api/simulate/
-                <br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;high_cpu
+                <span className="p">$</span> POST /api/incidents/{"{id}"}/investigate
               </div>
               <div style={{ marginTop: 12 }}>
-                <span className="c"># optional local LLM</span>
+                <span className="c"># 4. approve as SRE → EXECUTED</span>
               </div>
               <div>
-                <span className="p">$</span> ollama pull llama3.1:8b
+                <span className="p">$</span> POST /api/incidents/{"{id}"}/approve
               </div>
             </div>
           </div>
@@ -725,7 +720,7 @@ export default function Home() {
             </div>
             <div className="footer-status">
               <span className="pulse" />
-              Demo stack ready
+              Hosted demo · open signup
             </div>
           </div>
 
