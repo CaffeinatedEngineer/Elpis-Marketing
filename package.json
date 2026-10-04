@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
+    "start": "npx serve out -l 3100",
+    "deploy": "next build && wrangler pages deploy out --project-name elpis --branch main",
     "lint": "eslint"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.147.0"
   }
 }
