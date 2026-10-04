@@ -1,8 +1,8 @@
 import ScrollReveal from "./reveal";
 import SiteEffects from "./site-effects";
-
-// Hosted app (Cloudflare quick tunnel — update when a stable domain lands).
-const APP = "https://lisa-threats-exclusive-managed.trycloudflare.com";
+import SiteHeader from "../components/site-header";
+import SiteFooter from "../components/site-footer";
+import { APP } from "../lib/site";
 
 const whyItems = [
   {
@@ -161,33 +161,6 @@ const agentLanes = [
   { label: "Memory", value: "3 similar incidents", tone: "accent" },
 ];
 
-const footerLinks = {
-  Platform: [
-    ["Investigation graph", "#platform"],
-    ["Evidence and root cause", "#platform"],
-    ["Risk engine and approvals", "#how"],
-    ["Memory and runbooks", "#how"],
-  ],
-  Developers: [
-    ["Quickstart", "#start"],
-    ["Live app", APP],
-    ["Evaluation harness", "#evaluation"],
-    ["Sign up", `${APP}/signup`],
-  ],
-  Architecture: [
-    ["LangGraph workflow", "#how"],
-    ["Model routing and budgets", "#how"],
-    ["Incident RAG", "#how"],
-    ["Observability", "#how"],
-  ],
-  Project: [
-    ["Try the demo", `${APP}/login`],
-    ["Sign up free", `${APP}/signup`],
-    ["Apply for startups", "/apply"],
-    ["Bring your own key", "#start"],
-  ],
-};
-
 export default function Home() {
   return (
     <main>
@@ -195,42 +168,7 @@ export default function Home() {
       <SiteEffects />
       <div className="noise" aria-hidden="true" />
       {/* Header */}
-      <header className="header">
-        <div className="shell header-inner">
-          <a href="#" className="brand">
-            <span className="brand-mark" />
-            Elpis
-          </a>
-          <nav className="nav">
-            <a href="#why">Why Elpis</a>
-            <a href="#platform">Platform</a>
-            <a href="#how">How it works</a>
-            <a href="#evaluation">Evaluation</a>
-            <a href="#start">Get started</a>
-            <a href="/apply">For startups</a>
-          </nav>
-          <div className="header-cta">
-            <a className="btn btn-ghost btn-sm" href={`${APP}/signup`}>
-              Try it free
-            </a>
-            <a className="btn btn-sm" href="/apply">
-              Apply now
-            </a>
-          </div>
-          <details className="mobile-nav">
-            <summary>Menu</summary>
-            <div className="mobile-nav-panel">
-              <a href="#why">Why Elpis</a>
-              <a href="#platform">Platform</a>
-              <a href="#how">How it works</a>
-              <a href="#evaluation">Evaluation</a>
-              <a href="#start">Get started</a>
-              <a href="/apply">For startups</a>
-              <a href={`${APP}/signup`}>Try it free</a>
-            </div>
-          </details>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="hero grid-bg">
@@ -245,8 +183,8 @@ export default function Home() {
               <p className="lede" style={{ marginTop: 24 }}>
                 Elpis is an AI SRE that correlates logs, metrics, traces, deployments and Git
                 changes into an evidence-backed root cause, proposes a risk-classified fix, and
-                executes only after a human says yes, with a full audit trail. Open signup — no
-                card, no sales call — and you bring your own LLM key, so there is zero markup on
+                executes only after a human says yes, with a full audit trail. Open signup, no
+                card, no sales call, and you bring your own LLM key, so there is zero markup on
                 your AI spend.
               </p>
               <div className="hero-actions">
@@ -659,7 +597,7 @@ export default function Home() {
               </div>
               <h2 className="h2">Try it free in your browser.</h2>
               <p className="lede" style={{ marginTop: 20 }}>
-                Sign up with an email and password — you start at SRE. Inject a fault, hit
+                Sign up with an email and password and you start at SRE. Inject a fault, hit
                 investigate, and watch the agent graph, timeline and evidence fill in live. Then
                 approve the fix and see it verify recovery. Every account gets private incidents,
                 your own OpenAI-compatible key in Settings (or the free built-in model), and demo
@@ -676,7 +614,7 @@ export default function Home() {
             </div>
             <div className="code" aria-hidden="true">
               <div>
-                <span className="c"># 1. sign up — open registration, role SRE</span>
+                <span className="c"># 1. sign up: open registration, role SRE</span>
               </div>
               <div>
                 <span className="p">$</span> POST /api/auth/signup
@@ -688,7 +626,7 @@ export default function Home() {
                 <span className="p">$</span> POST /api/simulate/high_cpu
               </div>
               <div style={{ marginTop: 12 }}>
-                <span className="c"># 3. investigate — runs in the background</span>
+                <span className="c"># 3. investigate: runs in the background</span>
               </div>
               <div>
                 <span className="p">$</span> POST /api/incidents/{"{id}"}/investigate
@@ -705,59 +643,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="shell">
-          <div className="footer-hero">
-            <div>
-              <a href="#" className="brand footer-brand">
-                <span className="brand-mark" />
-                Elpis
-              </a>
-              <p>
-                An AI SRE for evidence-backed root cause analysis, risk-classified remediation,
-                and human-approved recovery.
-              </p>
-            </div>
-            <div className="footer-status">
-              <span className="pulse" />
-              Hosted demo · open signup
-            </div>
-          </div>
-
-          <div className="footer-cols">
-            {Object.entries(footerLinks).map(([group, links]) => (
-              <div className="footer-col" key={group}>
-                <h4>{group}</h4>
-                {links.map(([label, href]) => {
-                  const external = href.startsWith("http");
-                  return (
-                    <a
-                      href={href}
-                      key={label}
-                      target={external ? "_blank" : undefined}
-                      rel={external ? "noopener noreferrer" : undefined}
-                    >
-                      {label}
-                    </a>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-          <div className="footer-fine">
-            <span>© 2026 Elpis. AI incident investigation and remediation.</span>
-            <span>FastAPI · LangGraph · Neon · Next.js</span>
-          </div>
-        </div>
-        <div className="footer-band">
-          <div className="shell footer-band-inner">
-            <div className="footer-word">Elpis</div>
-            <div className="footer-tagline">
-              Evidence-backed root causes. Human-approved fixes. Verified recovery.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

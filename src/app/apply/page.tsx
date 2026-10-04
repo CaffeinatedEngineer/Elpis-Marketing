@@ -4,11 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import ScrollReveal from "../reveal";
 import SiteEffects from "../site-effects";
+import SiteHeader from "../../components/site-header";
+import SiteFooter from "../../components/site-footer";
+import { CONTACT } from "../../lib/site";
 
-// Hosted app (Cloudflare quick tunnel — update when a stable domain lands).
-const APP = "https://lisa-threats-exclusive-managed.trycloudflare.com";
 // No signup, no server: FormSubmit relays submissions to this inbox.
-const FORM_ENDPOINT = "https://formsubmit.co/ajax/notsekiro11@gmail.com";
+const FORM_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT}`;
+const THROTTLE_KEY = "elpis_apply_last";
+const THROTTLE_MS = 60_000;
 
 const labelStyle: React.CSSProperties = {
   display: "block",
@@ -44,10 +47,24 @@ export default function ApplyPage() {
   const [team, setTeam] = useState("");
   const [stack, setStack] = useState("");
   const [goal, setGoal] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [website, setWebsite] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error" | "throttled">(
+    "idle",
+  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Honeypot: humans never see this field, so pretend success and stop.
+    if (website) {
+      setStatus("sent");
+      return;
+    }
+    const last = Number(localStorage.getItem(THROTTLE_KEY) || "0");
+    if (Date.now() - last < THROTTLE_MS) {
+      setStatus("throttled");
+      return;
+    }
+    localStorage.setItem(THROTTLE_KEY, String(Date.now()));
     setStatus("sending");
     try {
       const res = await fetch(FORM_ENDPOINT, {
@@ -57,10 +74,10 @@ export default function ApplyPage() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          _subject: `Elpis apply — ${company || name}`,
+          _subject: `Elpis apply: ${company || name}`,
           _replyto: email,
           _captcha: "false",
-          _honey: "",
+          _honey: website,
           // FormSubmit rejects requests without the submitting page's URL.
           _url: `${window.location.origin}/apply`,
           Name: name,
@@ -83,41 +100,7 @@ export default function ApplyPage() {
       <ScrollReveal />
       <SiteEffects />
       <div className="noise" aria-hidden="true" />
-      {/* Header */}
-      <header className="header">
-        <div className="shell header-inner">
-          <Link href="/" className="brand">
-            <span className="brand-mark" />
-            Elpis
-          </Link>
-          <nav className="nav">
-            <Link href="/#why">Why Elpis</Link>
-            <Link href="/#platform">Platform</Link>
-            <Link href="/#how">How it works</Link>
-            <Link href="/#evaluation">Evaluation</Link>
-            <Link href="/#start">Get started</Link>
-          </nav>
-          <div className="header-cta">
-            <Link href="/" className="btn btn-ghost btn-sm">
-              ← Back to site
-            </Link>
-            <a className="btn btn-sm" href={`${APP}/signup`}>
-              Try it free
-            </a>
-          </div>
-          <details className="mobile-nav">
-            <summary>Menu</summary>
-            <div className="mobile-nav-panel">
-              <Link href="/#why">Why Elpis</Link>
-              <Link href="/#platform">Platform</Link>
-              <Link href="/#how">How it works</Link>
-              <Link href="/#evaluation">Evaluation</Link>
-              <Link href="/#start">Get started</Link>
-              <a href={`${APP}/signup`}>Try it free</a>
-            </div>
-          </details>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Apply */}
       <section className="section" id="apply">
@@ -131,15 +114,15 @@ export default function ApplyPage() {
               <p className="lede" style={{ marginTop: 20 }}>
                 Tell us what you run and what you want watched. We reply within one business day,
                 jump on a 30-minute scoping call, and quote a fixed-price Launch build up front.
-                We deploy Elpis for you — you bring your own LLM key and keep the keys, the data
-                and the audit trail. No per-seat pricing, no usage markup.
+                We deploy Elpis for you and you bring your own LLM key, so you keep the keys, the
+                data and the audit trail. No per-seat pricing, no usage markup.
               </p>
               <div className="code" aria-hidden="true" style={{ marginTop: 28 }}>
                 <div>
                   <span className="c"># what happens after you apply</span>
                 </div>
                 <div>1. we reply within 1 business day</div>
-                <div>2. 30-min scoping call — no pitch deck</div>
+                <div>2. 30-min scoping call, no pitch deck</div>
                 <div>3. fixed-price Launch build, quoted up front</div>
                 <div>4. we deploy it; you BYOK your own key</div>
                 <div>
@@ -165,7 +148,7 @@ export default function ApplyPage() {
                       Application received
                     </div>
                     <p className="lede" style={{ fontSize: 16, marginTop: 0 }}>
-                      Thanks{name ? `, ${name.split(" ")[0]}` : ""} — your application is in our
+                      Thanks{name ? `, ${name.split(" ")[0]}` : ""}, your application is in our
                       inbox. We&apos;ll reply within one business day to set up the scoping call.
                     </p>
                     <Link className="btn btn-ghost" href="/" style={{ marginTop: 8 }}>
@@ -175,7 +158,7 @@ export default function ApplyPage() {
                 ) : (
                   <form onSubmit={onSubmit}>
                     <div style={{ ...labelStyle, color: "var(--ink)" }}>
-                      Apply — takes 30 seconds
+                      Apply: takes 30 seconds
                     </div>
 
                     <div style={fieldGroup}>
@@ -186,6 +169,7 @@ export default function ApplyPage() {
                         id="apply-name"
                         type="text"
                         required
+                        maxLength={100}
                         autoComplete="name"
                         placeholder="Ada Lovelace"
                         style={fieldStyle}
@@ -202,6 +186,7 @@ export default function ApplyPage() {
                         id="apply-email"
                         type="email"
                         required
+                        maxLength={254}
                         autoComplete="email"
                         placeholder="you@startup.dev"
                         style={fieldStyle}
@@ -218,6 +203,7 @@ export default function ApplyPage() {
                         id="apply-company"
                         type="text"
                         required
+                        maxLength={200}
                         autoComplete="organization"
                         placeholder="Acme Payments"
                         style={fieldStyle}
@@ -255,6 +241,7 @@ export default function ApplyPage() {
                       <input
                         id="apply-stack"
                         type="text"
+                        maxLength={300}
                         placeholder="AWS, Kubernetes, Datadog…"
                         style={fieldStyle}
                         value={stack}
@@ -270,12 +257,48 @@ export default function ApplyPage() {
                         id="apply-goal"
                         required
                         rows={4}
+                        maxLength={2000}
                         placeholder="Watch our production API, investigate alerts, propose fixes we can approve…"
                         style={{ ...fieldStyle, resize: "vertical" }}
                         value={goal}
                         onChange={(e) => setGoal(e.target.value)}
                       />
                     </div>
+
+                    {/* Honeypot: hidden from humans, bots tend to fill it. */}
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: "-9999px",
+                        width: 1,
+                        height: 1,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={website}
+                        onChange={(e) => setWebsite(e.target.value)}
+                      />
+                    </div>
+
+                    {status === "throttled" && (
+                      <p
+                        style={{
+                          color: "#b3261e",
+                          fontSize: 14,
+                          lineHeight: 1.5,
+                          margin: "0 0 14px",
+                        }}
+                      >
+                        You just sent an application. Please wait a minute before sending
+                        another one.
+                      </p>
+                    )}
 
                     {status === "error" && (
                       <p
@@ -287,14 +310,14 @@ export default function ApplyPage() {
                         }}
                       >
                         Something went wrong sending the form. Email us directly at{" "}
-                        <a href="mailto:notsekiro11@gmail.com">notsekiro11@gmail.com</a>.
+                        <a href={`mailto:${CONTACT}`}>{CONTACT}</a>.
                       </p>
                     )}
 
                     <button
                       className="btn btn-accent"
                       type="submit"
-                      disabled={status === "sending"}
+                      disabled={status === "sending" || status === "throttled"}
                       style={{ width: "100%", opacity: status === "sending" ? 0.6 : 1 }}
                     >
                       {status === "sending" ? "Sending…" : "Send application →"}
@@ -321,39 +344,7 @@ export default function ApplyPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="shell">
-          <div className="footer-hero">
-            <div>
-              <Link href="/" className="brand footer-brand">
-                <span className="brand-mark" />
-                Elpis
-              </Link>
-              <p>
-                An AI SRE for evidence-backed root cause analysis, risk-classified remediation,
-                and human-approved recovery.
-              </p>
-            </div>
-            <div className="footer-status">
-              <span className="pulse" />
-              Hosted demo · open signup
-            </div>
-          </div>
-          <div className="footer-fine">
-            <span>© 2026 Elpis. AI incident investigation and remediation.</span>
-            <span>FastAPI · LangGraph · Neon · Next.js</span>
-          </div>
-        </div>
-        <div className="footer-band">
-          <div className="shell footer-band-inner">
-            <div className="footer-word">Elpis</div>
-            <div className="footer-tagline">
-              Evidence-backed root causes. Human-approved fixes. Verified recovery.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
